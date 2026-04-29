@@ -37,14 +37,14 @@ def gradient(x, y, function):
 
 
 
-def find_lamda(x, y, direction, function, one_dim_method):
-    lamda_interval = odm.lamda_interval_search(x, y, direction, function)
-    lamda = one_dim_method(x, y, direction, function,
+def find_lamda(x, y, function, one_dim_method):
+    lamda_interval = odm.lamda_interval_search(x, y, function)
+    lamda = one_dim_method(x, y, function,
                            a=lamda_interval[0], b=lamda_interval[1])
     return lamda
 
 
-def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5):
+def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-3):
     coords_prev = np.zeros(2)
     coords_next = np.zeros(2)
     delta_func = 1.0
@@ -59,7 +59,6 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
     y_values = np.array(coords_prev[1])
     
     i = 0
-    print("Gradient:")
     print("TABLE 2 FOR GRADIENT DECENT")
     print(f'iter num | '
           f'{"coords":^32} | '
@@ -74,7 +73,7 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
     while abs(delta_func) > eps:
         direction = -gradient(coords_prev[0], coords_prev[1], function)
         lamda = find_lamda(coords_prev[0], coords_prev[1], 
-                           direction, function, one_dim_method)
+                           function, one_dim_method)
         
         coords_next = coords_prev + lamda * direction
 
@@ -127,7 +126,7 @@ def find_Hesse(delta_coords, delta_grad, Hesse):
     return Hesse
 
 
-def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5):
+def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-3):
     coords_prev = np.zeros(2)
     coords_next = np.zeros(2)
     delta_func = 1.0
@@ -162,7 +161,7 @@ def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5)
         grad_prev = gradient(coords_prev[0], coords_prev[1], function)
         direction = -Hesse.dot(grad_prev)  
         lamda = find_lamda(coords_prev[0], coords_prev[1], 
-                           direction, function, one_dim_method)
+                           function, one_dim_method)
         
         coords_next = coords_prev + lamda * direction
         grad_next = gradient(coords_next[0], coords_next[1], function)

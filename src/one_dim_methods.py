@@ -17,19 +17,19 @@ def find_n_for_fibonacci(*, a=-2, b=20, eps):
     n = int(t2 / t1 + 1)
     return n
 
-def lamda_interval_search(x, y, direction, function):
+def lamda_interval_search(x, y, function):
     sigma = 0.0001
-    lamda_prev = 0.
+    lamda_prev = -1.
     k = 1
     
-    #x_der = partial_derivative_x(x, y, function)
-    #y_der = partial_derivative_y(x, y, function)
+    x_der = partial_derivative_x(x, y, function)
+    y_der = partial_derivative_y(x, y, function)
     
-    x_prev = x + lamda_prev * direction[0]
-    y_prev = y + lamda_prev * direction[1]
+    x_prev = x - lamda_prev * x_der
+    y_prev = y - lamda_prev * y_der
     
-    x_next = x + (lamda_prev + sigma) * direction[0]
-    y_next = y + (lamda_prev + sigma) * direction[1]
+    x_next = x - (lamda_prev + sigma) * x_der
+    y_next = y - (lamda_prev + sigma) * y_der
     
     if function(x_prev, y_prev) > function(x_next, y_next):
         lamda_next = lamda_prev + sigma
@@ -46,8 +46,8 @@ def lamda_interval_search(x, y, direction, function):
         
         x_prev, y_prev = x_next, y_next
         
-        x_next = x + lamda_next * direction[0]
-        y_next = y + lamda_next * direction[1]
+        x_next = x - lamda_next * x_der
+        y_next = y - lamda_next * y_der
 
         k += 1
         if function(x_prev, y_prev) > function(x_next, y_next):
@@ -60,12 +60,12 @@ def lamda_interval_search(x, y, direction, function):
     else:
         return np.array([lamda_next, lamda_prev+h/2]) 
       
-def dichotomy(x, y, direction, function, a=-2, b=20, eps=1e-7):
+def dichotomy(x, y, function, a=-2, b=20, eps=1e-7):
     a1 = a
     b1 = b
     
-    #x_der = partial_derivative_x(x, y, function)
-    #y_der = partial_derivative_y(x, y, function)
+    x_der = partial_derivative_x(x, y, function)
+    y_der = partial_derivative_y(x, y, function)
     
     i = 1
     while b1 - a1 > eps:
@@ -74,11 +74,11 @@ def dichotomy(x, y, direction, function, a=-2, b=20, eps=1e-7):
         lamda1 = (a1 + b1 - delta) / 2
         lamda2 = (a1 + b1 + delta) / 2
         
-        x1 = x + lamda1 * direction[0]
-        y1 = y + lamda1 * direction[1]
+        x1 = x - lamda1 * x_der
+        y1 = y - lamda1 * y_der
         
-        x2 = x + lamda2 * direction[0]
-        y2 = y + lamda2 * direction[1]
+        x2 = x - lamda2 * x_der
+        y2 = y - lamda2 * y_der
 
         if function(x1, y1) < function(x2, y2):
             b1 = lamda2
@@ -88,25 +88,25 @@ def dichotomy(x, y, direction, function, a=-2, b=20, eps=1e-7):
         i += 1
     return (a1 + b1) / 2
 
-def parabola_method(x, y, direction, function, a=-2, b=20, eps=1e-7,  h=0.5):
+def parabola_method(x, y, function, a=-2, b=20, eps=1e-7,  h=0.5):
     lamda_middle = (a + b) / 2
     lamda_min = - lamda_middle
     
-    #x_der = partial_derivative_x(x, y, function)
-    #y_der = partial_derivative_y(x, y, function)
+    x_der = partial_derivative_x(x, y, function)
+    y_der = partial_derivative_y(x, y, function)
 
     while abs(lamda_min - lamda_middle) > eps:
         lamda_left = lamda_middle - h
         lamda_right = lamda_middle + h
         
-        x_left = x + lamda_left * direction[0]
-        y_left = y + lamda_left * direction[1]
+        x_left = x - lamda_left * x_der
+        y_left = y - lamda_left * y_der
         
-        x_right = x + lamda_right * direction[0]
-        y_right = y + lamda_right * direction[1]
+        x_right = x - lamda_right * x_der
+        y_right = y - lamda_right * y_der
         
-        x_middle = x + lamda_middle * direction[0]
-        y_middle = y + lamda_middle * direction[1]
+        x_middle = x - lamda_middle * x_der
+        y_middle = y - lamda_middle * y_der
         
         lamda_min = 0.5 * ((function(x_left, y_left) * 
                             (lamda_right + lamda_middle) - 2 * 
@@ -122,7 +122,7 @@ def parabola_method(x, y, direction, function, a=-2, b=20, eps=1e-7,  h=0.5):
         lamda_middle = lamda_min
     return lamda_min
 
-def golden_section_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
+def golden_section_method(x, y, function, a=-2, b=20, eps=1e-7):
     a1 = a
     b1 = b
 
@@ -132,14 +132,14 @@ def golden_section_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
     lamda1 = a + coeff_1 * (b - a)
     lamda2 = a + coeff_2 * (b - a)
 
-    #x_der = partial_derivative_x(x, y, function)
-    #y_der = partial_derivative_y(x, y, function)
+    x_der = partial_derivative_x(x, y, function)
+    y_der = partial_derivative_y(x, y, function)
 
-    x1 = x + lamda1 * direction[0]
-    y1 = y + lamda1 * direction[1]
+    x1 = x - lamda1 * x_der
+    y1 = y - lamda1 * y_der
     
-    x2 = x + lamda2 * direction[0]
-    y2 = y + lamda2 * direction[1]
+    x2 = x - lamda2 * x_der
+    y2 = y - lamda2 * y_der
     
     func_value_1 = function(x1, y1)
     func_value_2 = function(x2, y2)
@@ -156,8 +156,8 @@ def golden_section_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
             y2 = y1
             func_value_2 = func_value_1
             lamda1 = a2 + coeff_1 * (b2 - a2)
-            x1 = x + lamda1 * direction[0]
-            y1 = y + lamda1 * direction[1]
+            x1 = x - lamda1 * x_der
+            y1 = y - lamda1 * y_der
             func_value_1 = function(x1, y1)
         else:
             a2 = lamda1
@@ -166,8 +166,8 @@ def golden_section_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
             y1 = y2
             func_value_1 = func_value_2
             lamda2 = a2 + coeff_2 * (b2 - a2)
-            x2 = x + lamda2 * direction[0]
-            y2 = y + lamda2 * direction[1]
+            x2 = x - lamda2 * x_der
+            y2 = y - lamda2 * y_der
             func_value_2 = function(x2, y2)
             
         b1 = b2
@@ -175,7 +175,7 @@ def golden_section_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
         i += 1
     return (a1 + b1) / 2
 
-def fibonacci_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
+def fibonacci_method(x, y, function, a=-2, b=20, eps=1e-7):
     initial_length = b - a
     a1 = a
     b1 = b
@@ -187,14 +187,14 @@ def fibonacci_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
     lamda1 = a + fibonacci_num(n) / Fn2 * initial_length
     lamda2 = a + fibonacci_num(n + 1) / Fn2 * initial_length
     
-    #x_der = partial_derivative_x(x, y, function)
-    #y_der = partial_derivative_y(x, y, function)
+    x_der = partial_derivative_x(x, y, function)
+    y_der = partial_derivative_y(x, y, function)
 
-    x1 = x + lamda1 * direction[0]
-    y1 = y + lamda1 * direction[1]
+    x1 = x - lamda1 * x_der
+    y1 = y - lamda1 * y_der
     
-    x2 = x + lamda2 * direction[0]
-    y2 = y + lamda2 * direction[1]
+    x2 = x - lamda2 * x_der
+    y2 = y - lamda2 * y_der
     
     func_value_1 = function(x1, y1)
     func_value_2 = function(x2, y2)
@@ -211,16 +211,16 @@ def fibonacci_method(x, y, direction, function, a=-2, b=20, eps=1e-7):
             y2 = y1
             func_value_2 = func_value_1
             lamda1 = a2 + fibonacci_num(n - i) / Fn2 * initial_length
-            x1 = x + lamda1 * direction[0]
-            y1 = y + lamda1 * direction[1]
+            x1 = x - lamda1 * x_der
+            y1 = y - lamda1 * y_der
             func_value_1 = function(x1, y1)
         else:
             a2 = lamda1
             lamda1 = lamda2
             func_value_1 = func_value_2
             lamda2 = a2 + fibonacci_num(n - i + 1) / Fn2 * initial_length
-            x2 = x + lamda2 * direction[0]
-            y2 = y + lamda2 * direction[1]
+            x2 = x - lamda2 * x_der
+            y2 = y - lamda2 * y_der
             func_value_2 = function(x2, y2)
 
         b1 = b2
