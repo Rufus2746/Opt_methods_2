@@ -44,7 +44,7 @@ def find_lamda(x, y, function, one_dim_method):
     return lamda
 
 
-def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-3):
+def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5):
     coords_prev = np.zeros(2)
     coords_next = np.zeros(2)
     delta_func = 1.0
@@ -52,8 +52,8 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-3
     #coords_prev[0] = input("Enter x0 ")
     #coords_prev[1] = input("Enter y0 ")
 
-    coords_prev[0] = -4.
-    coords_prev[1] = 2.
+    coords_prev[0] = 4.
+    coords_prev[1] = -2.
 
     x_values = np.array(coords_prev[0])
     y_values = np.array(coords_prev[1])
@@ -126,7 +126,7 @@ def find_Hesse(delta_coords, delta_grad, Hesse):
     return Hesse
 
 
-def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-3):
+def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5):
     coords_prev = np.zeros(2)
     coords_next = np.zeros(2)
     delta_func = 1.0
@@ -137,8 +137,8 @@ def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-3)
     #coords_prev[0] = input("Enter x0 ")
     #coords_prev[1] = input("Enter y0 ")
 
-    coords_prev[0] = -4.
-    coords_prev[1] = 2.
+    coords_prev[0] = 4.
+    coords_prev[1] = -2.
 
     x_values = np.array(coords_prev[0])
     y_values = np.array(coords_prev[1])
@@ -236,3 +236,8 @@ if __name__ == "__main__":
     # 0 2000 2000
     #plot(personal_function)
     # -3 2 50
+
+    # Подозрения на некорректный сброс матрицы в методе Бройдена
+    # Квадратичная функция сходится на 2ом шаге
+    # Функция Розенброка погнао работает на ноуте. Разобраться почему
+    # Функция варианта должна находить направление в любой ситуации. Даже в точке за пределами
