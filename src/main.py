@@ -37,9 +37,9 @@ def gradient(x, y, function):
 
 
 
-def find_lamda(x, y, direction, function, one_dim_method):
-    lamda_interval = odm.lamda_interval_search(x, y, direction, function)
-    lamda = one_dim_method(x, y, direction, function,
+def find_lamda(x, y, function, one_dim_method):
+    lamda_interval = odm.lamda_interval_search(x, y, function)
+    lamda = one_dim_method(x, y, function,
                            a=lamda_interval[0], b=lamda_interval[1])
     return lamda
 
@@ -52,14 +52,14 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
     #coords_prev[0] = input("Enter x0 ")
     #coords_prev[1] = input("Enter y0 ")
 
-    coords_prev[0] = -4.
-    coords_prev[1] = 2.
+    coords_prev[0] = 9.
+    coords_prev[1] = 8.
 
     x_values = np.array(coords_prev[0])
     y_values = np.array(coords_prev[1])
     
     i = 0
-    print("Gradient:")
+
     print("TABLE 2 FOR GRADIENT DECENT")
     print(f'iter num | '
           f'{"coords":^32} | '
@@ -70,11 +70,12 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
           f'{"delta func":^15} | '
           f'{"angle":^15} | '
           f'{"gradient":^32} | ')
+
     
     while abs(delta_func) > eps:
         direction = -gradient(coords_prev[0], coords_prev[1], function)
         lamda = find_lamda(coords_prev[0], coords_prev[1], 
-                           direction, function, one_dim_method)
+                           function, one_dim_method)
         
         coords_next = coords_prev + lamda * direction
 
@@ -84,8 +85,8 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
         delta_coords = coords_next - coords_prev
         delta_func = func_value_next - func_value_prev
         
+
         grad_next = gradient(coords_next[0], coords_next[1], function)
-        
         angle = acos(np.dot(coords_next, direction) /
                      np.linalg.norm(coords_next) / np.linalg.norm(direction))
         
@@ -93,6 +94,7 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
         y_values = np.append(y_values, [coords_next[1]])
         
         i += 1
+
         print(f'{i:^8} | '
               f'{coords_next[0]:^15.8e}  {coords_next[1]:^15.8e} | '
               f'{func_value_next:^15.8e} | '
@@ -102,20 +104,38 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
               f'{delta_func:^15.8e} | '
               f'{angle:^15.8e} | '
               f'{grad_next[0]:^15.8e}  {grad_next[1]:^15.8e} | ')
+
         
         coords_prev = coords_next.copy()
-    """
-    print("\nINFO FOR TABLE1\n")
+
+    print("\nINFO FOR TABLE1\nGradien decent\n")
     print(f'eps   | iter_count | func_counter | {"coords":^30} | func value  ')
     print(f'{eps} | {i:^10} | {func_counter:^12} | {coords_next[0]:.8e}  '
           f'{coords_next[1]:.8e} | {func_value_next:.8e}')
-    """
+
+
     
     reset_counter()
     return x_values, y_values
 
-
 def find_Hesse(delta_coords, delta_grad, Hesse):
+    I = np.eye(2)
+    
+    denom = np.dot(delta_grad, delta_coords)
+    
+    if abs(denom) <= 1e-10:
+        return Hesse 
+        
+    coeff = 1.0 / denom
+    
+    A1 = I - coeff * np.outer(delta_coords, delta_grad)
+    A2 = I - coeff * np.outer(delta_grad, delta_coords)
+    
+    new_Hesse = A1 @ Hesse @ A2 + coeff * np.outer(delta_coords, delta_coords)
+    
+    return new_Hesse
+
+def find_Hesse_old(delta_coords, delta_grad, Hesse):
     I = np.eye(2)
     denom  = np.dot(delta_grad, delta_coords)
     if(denom <= 1e-10):
@@ -138,14 +158,13 @@ def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5)
     #coords_prev[0] = input("Enter x0 ")
     #coords_prev[1] = input("Enter y0 ")
 
-    coords_prev[0] = -4.
-    coords_prev[1] = 2.
+    coords_prev[0] = 9.
+    coords_prev[1] = 8.
 
     x_values = np.array(coords_prev[0])
     y_values = np.array(coords_prev[1])
 
     i = 0
-
     print("TABLE 2 FOR BROYDEN METHOD")
     print(f'{"Hesse":^25} | '
           f'iter num | '
@@ -161,8 +180,9 @@ def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5)
     while abs(delta_func) > eps:
         grad_prev = gradient(coords_prev[0], coords_prev[1], function)
         direction = -Hesse.dot(grad_prev)  
+
         lamda = find_lamda(coords_prev[0], coords_prev[1], 
-                           direction, function, one_dim_method)
+                           function, one_dim_method)
         
         coords_next = coords_prev + lamda * direction
         grad_next = gradient(coords_next[0], coords_next[1], function)
@@ -197,12 +217,13 @@ def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5)
 
         
         coords_prev = coords_next.copy()
-    """
-    print("\nINFO FOR TABLE1\n")
+
+    print("\nINFO FOR TABLE1\nBroyden\n")
     print(f'eps   | iter_count | func_counter | {"coords":^30} | func value  ')
     print(f'{eps} | {i:^10} | {func_counter:^12} | {coords_next[0]:.8e}  '
           f'{coords_next[1]:.8e} | {func_value_next:.8e}')
-    """
+
+
     
     reset_counter()
     return x_values, y_values
@@ -232,8 +253,8 @@ def plot(function):
     plt.show()
 
 if __name__ == "__main__":
-    #plot(quadratic_function)
-    plot(rosenbrock_function)
+    plot(quadratic_function)
+    #plot(rosenbrock_function)
     # 0 2000 2000
     #plot(personal_function)
     # -3 2 50
