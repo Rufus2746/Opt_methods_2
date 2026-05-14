@@ -6,6 +6,10 @@ from math import exp
 
 func_counter = 0
 
+# Костыль для быстрых тестов
+x_global = 4.
+y_global = 2.
+
 def reset_counter():
     global func_counter
     func_counter = 0
@@ -44,7 +48,7 @@ def find_lamda(x, y, function, one_dim_method):
     return lamda
 
 
-def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5):
+def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-3):
     coords_prev = np.zeros(2)
     coords_next = np.zeros(2)
     delta_func = 1.0
@@ -52,8 +56,8 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
     #coords_prev[0] = input("Enter x0 ")
     #coords_prev[1] = input("Enter y0 ")
 
-    coords_prev[0] = 4.
-    coords_prev[1] = -2.
+    coords_prev[0] = x_global
+    coords_prev[1] = y_global
 
     x_values = np.array(coords_prev[0])
     y_values = np.array(coords_prev[1])
@@ -92,23 +96,23 @@ def gradient_decent(function, one_dim_method=odm.golden_section_method, eps=1e-5
         y_values = np.append(y_values, [coords_next[1]])
         
         i += 1
-        print(f'{i:^8} | '
-              f'{coords_next[0]:^15.8e}  {coords_next[1]:^15.8e} | '
-              f'{func_value_next:^15.8e} | '
-              f'{direction[0]:^15.8e}  {direction[1]:^15.8e} | '
-              f'{lamda:^15.8e} | '
-              f'{delta_coords[0]:^15.8e}  {delta_coords[1]:^15.8e} | '
-              f'{delta_func:^15.8e} | '
-              f'{angle:^15.8e} | '
-              f'{grad_next[0]:^15.8e}  {grad_next[1]:^15.8e} | ')
+        print(f'{i:^8}\t'
+              f'{coords_next[0]:^15.8e}  {coords_next[1]:^15.8e}\t'
+              f'{func_value_next:^15.8e}\t'
+              f'{direction[0]:^15.8e}  {direction[1]:^15.8e}\t'
+              f'{lamda:^15.8e}\t'
+              f'{delta_coords[0]:^15.8e}  {delta_coords[1]:^15.8e}\t'
+              f'{delta_func:^15.8e}\t'
+              f'{angle:^15.8e}\t'
+              f'{grad_next[0]:^15.8e}  {grad_next[1]:^15.8e}\t')
         
         coords_prev = coords_next.copy()
-    """
+
     print("\nINFO FOR TABLE1\n")
     print(f'eps   | iter_count | func_counter | {"coords":^30} | func value  ')
     print(f'{eps} | {i:^10} | {func_counter:^12} | {coords_next[0]:.8e}  '
           f'{coords_next[1]:.8e} | {func_value_next:.8e}')
-    """
+
     
     reset_counter()
     return x_values, y_values
@@ -126,7 +130,7 @@ def find_Hesse(delta_coords, delta_grad, Hesse):
     return Hesse
 
 
-def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5):
+def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-3):
     coords_prev = np.zeros(2)
     coords_next = np.zeros(2)
     delta_func = 1.0
@@ -137,8 +141,8 @@ def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5)
     #coords_prev[0] = input("Enter x0 ")
     #coords_prev[1] = input("Enter y0 ")
 
-    coords_prev[0] = 4.
-    coords_prev[1] = -2.
+    coords_prev[0] = x_global
+    coords_prev[1] = y_global
 
     x_values = np.array(coords_prev[0])
     y_values = np.array(coords_prev[1])
@@ -183,31 +187,30 @@ def broyden_method(function, one_dim_method=odm.golden_section_method, eps=1e-5)
         y_values = np.append(y_values, [coords_next[1]])
         
         i += 1
-        print(f'{Hesse:} | '
-              f'{i:^8} | '
-              f'{coords_next[0]:^15.8e}  {coords_next[1]:^15.8e} | '
-              f'{func_value_next:^15.8e} | '
-              f'{direction[0]:^15.8e}  {direction[1]:^15.8e} | '
-              f'{lamda:^15.8e} | '
-              f'{delta_coords[0]:^15.8e}  {delta_coords[1]:^15.8e} | '
-              f'{delta_func:^15.8e} | '
-              f'{angle:^15.8e} | '
-              f'{grad_next[0]:^15.8e}  {grad_next[1]:^15.8e} | ')
+        print(f'{Hesse:}'
+              f'{i:^8}\t'
+              f'{coords_next[0]:^15.8e}  {coords_next[1]:^15.8e}\t'
+              f'{func_value_next:^15.8e}\t'
+              f'{direction[0]:^15.8e}  {direction[1]:^15.8e}\t'
+              f'{lamda:^15.8e}\t'
+              f'{delta_coords[0]:^15.8e}  {delta_coords[1]:^15.8e}\t'
+              f'{delta_func:^15.8e}\t'
+              f'{angle:^15.8e}\t'
+              f'{grad_next[0]:^15.8e}  {grad_next[1]:^15.8e}\t')
 
         
         coords_prev = coords_next.copy()
-    """
+
     print("\nINFO FOR TABLE1\n")
     print(f'eps   | iter_count | func_counter | {"coords":^30} | func value  ')
     print(f'{eps} | {i:^10} | {func_counter:^12} | {coords_next[0]:.8e}  '
           f'{coords_next[1]:.8e} | {func_value_next:.8e}')
-    """
     
     reset_counter()
     return x_values, y_values
 
 
-def plot(function):
+def plot(function, customFunctionFlag):
     x = np.linspace(-10, 10, 100)
     y = x
     
@@ -216,8 +219,10 @@ def plot(function):
     
     plt.figure(figsize=(5, 5))
 
-    plt.contourf(xgrid, ygrid, zgrid, np.linspace(0, 2000, 2000))
-    #plt.contourf(xgrid, ygrid, zgrid, np.linspace(-3, 2, 50))
+    if(customFunctionFlag):
+        plt.contourf(xgrid, ygrid, zgrid, np.linspace(-3, 2, 50))
+    else:
+        plt.contourf(xgrid, ygrid, zgrid, np.linspace(0, 2000, 2000))
 
     plt.colorbar()
 
@@ -230,12 +235,26 @@ def plot(function):
     plt.legend()
     plt.show()
 
+def main():
+    while True:
+        print("\n[1] - Quadratic function")
+        print("[2] - Rosenbrock function")
+        print("[3] - Personal function")
+        print("[4] - Exit")
+        
+        choice = input("\nPick an option: ")
+
+        if choice == '1':
+            plot(quadratic_function, False)
+        elif choice == '2':
+            plot(rosenbrock_function, False)
+        elif choice == '3':
+            plot(personal_function, True)
+        else:
+            break
+
 if __name__ == "__main__":
-    #plot(quadratic_function)
-    plot(rosenbrock_function)
-    # 0 2000 2000
-    #plot(personal_function)
-    # -3 2 50
+    main()
 
     # Подозрения на некорректный сброс матрицы в методе Бройдена
     # Квадратичная функция сходится на 2ом шаге
