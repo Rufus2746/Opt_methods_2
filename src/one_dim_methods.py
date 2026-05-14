@@ -19,7 +19,46 @@ def find_n_for_fibonacci(*, a=-2, b=20, eps):
 
 def lamda_interval_search(x, y, function):
     sigma = 0.0001
-    lamda_prev = -1.
+    lmbda = 0.0
+    
+    x_der = partial_derivative_x(x, y, function)
+    y_der = partial_derivative_y(x, y, function)
+    
+    def f_line(l):
+        return function(x - l * x_der, y - l * y_der)
+
+    f0 = f_line(lmbda)
+    f_plus = f_line(lmbda + sigma)
+    
+    if f0 > f_plus:
+        h = sigma
+        lmbda_next = lmbda + sigma
+    else:
+        f_minus = f_line(lmbda - sigma)
+        if f_minus < f0:
+            h = -sigma
+            lmbda_next = lmbda - sigma
+        else:
+            return np.array([lmbda - sigma, lmbda + sigma])
+
+    lmbda_prev = lmbda
+    f_prev = f0
+    f_curr = f_line(lmbda_next)
+    
+    while f_curr < f_prev:
+        h *= 2
+        lmbda_prev = lmbda_next
+        f_prev = f_curr
+        
+        lmbda_next = lmbda_prev + h
+        f_curr = f_line(lmbda_next)
+    
+    points = sorted([lmbda_prev - h/2, lmbda_next]) 
+    return np.array(points)
+
+def lamda_interval_search_old(x, y, function):
+    sigma = 0.0001
+    lamda_prev = 0.
     k = 1
     
     x_der = partial_derivative_x(x, y, function)
